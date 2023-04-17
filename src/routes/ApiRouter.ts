@@ -10,6 +10,7 @@ apiRouter.post("/badge/add", async (request: Request, response: Response) => {
     try {
         await BadgeController.addBadgeToUser(request, response);
     } catch (e: any) {
+        console.error(e.message);
         response.status(500).send({message: "Unknown Error"});
     }
 });
@@ -18,6 +19,7 @@ apiRouter.post("/badge/remove", async (request: Request, response: Response) => 
     try {
         await BadgeController.removeBadgeFromUser(request, response);
     } catch (e) {
+        console.error(e.message);
         response.status(500).send({message: "Unknown Error"});
     }
 })
