@@ -1,4 +1,4 @@
-# forum-badge-api
+# Moodle Api
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin http://git.vatsim-germany.org/webdev-team/forum-badge-api.git
+git remote add origin https://git.vatsim-germany.org/trainingcenter/moodle-api.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](http://git.vatsim-germany.org/webdev-team/forum-badge-api/-/settings/integrations)
+- [ ] [Set up project integrations](https://git.vatsim-germany.org/trainingcenter/moodle-api/-/settings/integrations)
 
 ## Collaborate with your team
 
