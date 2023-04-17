@@ -17,7 +17,7 @@ async function addBadgeToUser(request: Request, response: Response): Promise<voi
     }
 
     const sql_find = `SELECT * FROM xf_cmtv_badges_user_badge WHERE user_id=? AND badge_id=?`;
-    const sql_insert = `INSERT INTO xf_cmtv_badges_user_badge (user_id, badge_id, award_date) VALUES (?, ?, NOW())`;
+    const sql_insert = `INSERT INTO xf_cmtv_badges_user_badge (user_id, badge_id, award_date, reason) VALUES (?, ?, NOW(), "")`;
 
     const data = await sequelizeHost.query(sql_find, {
         type: QueryTypes.SELECT,
