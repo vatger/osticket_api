@@ -7,6 +7,34 @@ import {QueryTypes} from "sequelize";
  * @param request
  * @param response
  */
+
+async function syncUserGroups(request: Request, response: Response): Promise<void>{
+    const requstData: {user_id: number; secondaryGroups: number[];} = request.body?.data;
+
+    if ( requstData?.user_id == null )
+    {
+        response.status(500).send({error: "user_id empty"});
+        return;
+    }
+
+    const sql_find_user: string = `SELECT * FROM ost_staff WHERE user_id=?`;
+    const sql_find_groups: string = `SELECT FROM ost_staff_dept_access WHERE staff_id=?`;
+    const sql_delete_roles: string = `DELETE FROM ost_staff_dept_access WHERE staff_id=?`;
+    const sql_insert_roles: string = `INSERT INTO ost_staff_dept_access (staff_id, dept_id, role_id, flags) VALUES (?, ?, ?, ?)`;
+
+    const data = await sequelizeHost.query(sql_find_user, {
+        type: QueryTypes.SELECT,
+        replacements: [requestData.user_id],
+    });
+
+    if (data.length == 0)
+    {
+        response.status(500).send({error: "user_id not exists"});
+        return;
+    }
+}
+
+/**
 async function addBadgeToUser(request: Request, response: Response): Promise<void> {
     const requestData: {user_id: number; badge_id: number;} = request.body?.data;
 
@@ -38,31 +66,8 @@ async function addBadgeToUser(request: Request, response: Response): Promise<voi
     response.send({message: "OK"});
 }
 
-/**
- * Removes a badge with id badge_id to the user with id user_id
- * @param request
- * @param response
- */
-async function removeBadgeFromUser(request: Request, response: Response): Promise<void> {
-    const requestData: {user_id: number; badge_id: number;} = request.body?.data;
 
-    if (requestData?.user_id == null || requestData?.badge_id == null)
-    {
-        response.status(500).send({error: "user_id or badge_id are empty"});
-        return;
-    }
-
-    const sql = `DELETE FROM xf_cmtv_badges_user_badge WHERE user_id=? AND badge_id=?`;
-
-    await sequelizeHost.query(sql, {
-        type: QueryTypes.DELETE,
-        replacements: [requestData.user_id, requestData.badge_id]
-    });
-
-    response.send({message: "OK"});
-}
-
+**/
 export default {
-    addBadgeToUser,
-    removeBadgeFromUser
+    syncUserGroups,
 }
