@@ -43,7 +43,7 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
 
     const data : OstStaffId[] = await sequelizeHost.query(sql_find_user, {
         type: QueryTypes.SELECT,
-        replacements: ["V".concat(requestData.user_id)],
+        replacements: ["v".concat(requestData.user_id)],
     });
     let StaffId: number;
 
@@ -102,7 +102,7 @@ async function createUser(Request : RequestData): Promise<number>{
 
     await sequelizeHost.query(sql_insert_user, {
         type: QueryTypes.INSERT,
-        replacements: [Config.DEFAULT_DEPT_ID, "V".concat(Request.user_id), Request.firstname, Request.lastname, Request.email]
+        replacements: [Config.DEFAULT_DEPT_ID, "v".concat(Request.user_id), Request.firstname, Request.lastname, Request.email]
     });
 
     const StaffId: StaffId[] = await sequelizeHost.query(sql_find_user, {
