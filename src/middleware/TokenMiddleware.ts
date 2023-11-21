@@ -4,6 +4,7 @@ import {Config} from "../core/Config";
 export async function authorizationTokenMiddleware(request: Request, response: Response, next: NextFunction)
 {
     let token = request.headers?.authorization ?? "";
+    console.log(request);
 
     const requestIP = request.socket.remoteAddress;
 
