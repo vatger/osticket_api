@@ -29,6 +29,8 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
 
     let userCreated = false;
     const requestData: RequestData = request.body;
+    console.log(request.body);
+    console.log(requestData);
 
     if ( requestData?.user_id == null || requestData?.user_id == ""  )
     {
