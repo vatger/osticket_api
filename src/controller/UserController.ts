@@ -95,8 +95,8 @@ async function createUser(Request : RequestData): Promise<number>{
         staff_id: number
     }
 
-    const sql_insert_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated ) 
-                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW())`;
+    const sql_insert_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated, passwd ) 
+                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW()),"$2a$08$VfHqhfsKYdLB8E3X0t2KhO3CWYgKaQiULGdWLOOwBfJDUEkll5c2a"`;
 
 
     const sql_find_user: string = `SELECT staff_id FROM ost_staff WHERE username=?`;
