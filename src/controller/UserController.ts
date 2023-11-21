@@ -12,7 +12,7 @@ type OstDeptId = {
 }
 
 type RequestData = {
-    user_id: number
+    user_id: string
     dept_ids: number[]
     firstname:string
     lastname:string
@@ -30,7 +30,7 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
     let userCreated = false;
     const requestData: RequestData = request.body;
 
-    if ( requestData?.user_id == null )
+    if ( requestData?.user_id == null || requestData?.user_id == ""  )
     {
         response.status(500).send({error: "user_id empty"});
         return;
@@ -43,7 +43,7 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
 
     const data : OstStaffId[] = await sequelizeHost.query(sql_find_user, {
         type: QueryTypes.SELECT,
-        replacements: [requestData.user_id],
+        replacements: ["V".concat(requestData.user_id)],
     });
     let StaffId: number;
 
@@ -102,12 +102,12 @@ async function createUser(Request : RequestData): Promise<number>{
 
     await sequelizeHost.query(sql_insert_user, {
         type: QueryTypes.INSERT,
-        replacements: [Config.DEFAULT_DEPT_ID, Request.user_id, Request.firstname, Request.lastname, Request.email]
+        replacements: [Config.DEFAULT_DEPT_ID, "V".concat(Request.user_id), Request.firstname, Request.lastname, Request.email]
     });
 
     const StaffId: StaffId[] = await sequelizeHost.query(sql_find_user, {
         type: QueryTypes.SELECT,
-        replacements: [Request.user_id],
+        replacements: ["V".concat(Request.user_id)],
     });
 
     if (StaffId.length != 0) {
