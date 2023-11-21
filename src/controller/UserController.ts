@@ -1,6 +1,7 @@
 import { Request, Response} from "express";
 import {sequelizeHost} from "../core/Sequelize";
 import {QueryTypes} from "sequelize";
+import {Config} from "../core/Config";
 
 type OstStaffId = {
     staff_id: number
@@ -93,7 +94,7 @@ async function createUser(Request : RequestData): Promise<number>{
     }
 
     const sql_insert_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated ) 
-                                                    VALUES ("1","1",?,?,?,?,"","","",NOW(),NOW())`;
+                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW())`;
 
 
     const sql_find_user: string = `SELECT staff_id FROM ost_staff WHERE username=?`;
@@ -101,7 +102,7 @@ async function createUser(Request : RequestData): Promise<number>{
 
     await sequelizeHost.query(sql_insert_user, {
         type: QueryTypes.INSERT,
-        replacements: [Request.user_id, Request.firstname, Request.lastname, Request.email]
+        replacements: [Config.DEFAULT_DEPT_ID, Request.user_id, Request.firstname, Request.lastname, Request.email]
     });
 
     const StaffId: StaffId[] = await sequelizeHost.query(sql_find_user, {

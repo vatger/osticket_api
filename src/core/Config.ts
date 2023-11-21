@@ -14,6 +14,7 @@ const required_env: Array<string> =
     [
         "APP_PORT", "APP_TOKEN",
         "DB_HOST_DIALECT", "DB_HOST_HOST", "DB_HOST_PORT", "DB_HOST_DATABASE_NAME", "DB_HOST_USERNAME", "DB_HOST_PASSWORD",
+        "DEFAULT_DEPT_ID"
     ];
 
 let env_missing: boolean = false;
@@ -47,6 +48,7 @@ export const Config =
         },
 
         APP_PORT: Number(process.env.APP_PORT),
+        DEFAULT_DEPT_ID: Number(process.env.DEFAULT_DEPT_ID)
     }
 
 export const SequelizeConfigHost: Options =
