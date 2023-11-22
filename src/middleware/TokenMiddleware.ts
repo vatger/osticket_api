@@ -4,7 +4,6 @@ import {Config} from "../core/Config";
 export async function authorizationTokenMiddleware(request: Request, response: Response, next: NextFunction)
 {
     let token = request.headers?.authorization ?? "";
-    console.log(request);
 
     const requestIP = request.socket.remoteAddress;
 
@@ -16,7 +15,6 @@ export async function authorizationTokenMiddleware(request: Request, response: R
 
     // Remove the token subsection
     const token_arr = token.split(" ");
-    console.log(token_arr);
     if (token_arr.length < 2)
     {
         response.status(401).send({message: "Malformed token."});
