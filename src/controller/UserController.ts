@@ -17,11 +17,19 @@ type User = {
     staff_id: number
     isactive: number
     pwd: string
-    created: boolean
+    iscreated?: boolean
 }
 
 type OstDeptId = {
     dept_id: number
+}
+
+function send_success_response(response: Response, user: User) {
+    response.send({
+        message: "OK",
+        usercreated: user.iscreated ?? false,
+        password: user.pwd
+    });
 }
 
 /**
@@ -35,7 +43,7 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
     let user: User = {  username: "",
                         isactive: 0,
                         pwd: "",
-                        created: false,
+                        iscreated: false,
                         staff_id: 0};
 
     const requestData: RequestData = request.body;
@@ -48,26 +56,27 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
     }
 
     // find user in osticket table
-    const users : User[] = await sequelizeHost.query(sql.find_user, {
+    const users: User[] = await sequelizeHost.query(sql.find_user, {
         type: QueryTypes.SELECT,
         replacements: ["v".concat(requestData.user_id)],
     });
 
-
     if (users.length != 0) {
         // user found => assign
         user = users[0];
+
     } else {
 
         if (requestData.dept_ids.length != 0) {
             // depts assigned => create user
             user = await createUser(requestData);
+            console.log(user);
             if (user.staff_id == 0) {
                 // user could not be created
                 response.status(500).send({error: "user could not be created"});
                 return;
             } else {
-                user.created = true;
+                user.iscreated = true;
             }
         }else{
             // no depts assigned => return
@@ -84,11 +93,20 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
             replacements: [1, user.staff_id]});
     }
     // User is active and no groups assigned => inactivate user
-    if( user.isactive == 1 && requestData.dept_ids.length == 0)
+    if(  requestData.dept_ids.length == 0)
     {
-        await sequelizeHost.query(sql.switch_active, {
-            type: QueryTypes.UPDATE,
-            replacements: [0, user.staff_id]});
+        if ( user.isactive == 1 ) {
+            await sequelizeHost.query(sql.switch_active, {
+                type: QueryTypes.UPDATE,
+                replacements: [0, user.staff_id]
+            });
+
+            send_success_response(response, user);
+            return;
+        } else {
+            send_success_response(response, user);
+            return;
+        }
     }
 
     // select current department assignments
@@ -118,21 +136,10 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
             replacements: [user.staff_id, dept_id,1,1]
         });
     }
-
-    response.send({message: "OK",
-                         usercreated: user.created,
-                         password: user.pwd});
+    send_success_response(response, user);
 }
 
 async function createUser(Request : RequestData): Promise<User> {
-
-    let user: User = {
-        username: "",
-        isactive: 0,
-        pwd: "",
-        created: false,
-        staff_id: 0
-    };
 
     // gen init pwd
     let crypto = require("crypto");
@@ -152,10 +159,11 @@ async function createUser(Request : RequestData): Promise<User> {
 
     if (users.length != 0) {
         let user: User = users[0];
-        user.created = true;
+        user.iscreated = true;
         user.pwd = pwd;
+        return user;
     }
-    return user;
+    return { staff_id: 0, username: "", iscreated: false, isactive: 0, pwd: "" };
 }
 export default {
     syncUserGroups,
