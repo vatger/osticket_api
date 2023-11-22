@@ -18,6 +18,10 @@ type RequestData = {
     lastname:string
     email:string
 }
+type UserCreation = {
+    staff_id: number
+    pwd: string
+}
 
 /**
  * Adds the Departments and creates the user if necessary
@@ -28,9 +32,8 @@ type RequestData = {
 async function syncUserGroups(request: Request, response: Response): Promise<void>{
 
     let userCreated = false;
+    let NewUser: UserCreation = {staff_id: 0, pwd: ""};
     const requestData: RequestData = request.body;
-    console.log(request.body);
-    console.log(requestData);
 
     if ( requestData?.user_id == null || requestData?.user_id == ""  )
     {
@@ -52,12 +55,13 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
     if (data.length != 0) {
         StaffId = data[0].staff_id;
     } else {
-        StaffId = await createUser(requestData);
-        if (StaffId == 0) {
+        NewUser = await createUser(requestData);
+        if (NewUser.staff_id == 0) {
             response.status(500).send({error: "user could not be created"});
             return;
         } else {
             userCreated = true;
+            StaffId = NewUser.staff_id
         }
     }
 
@@ -86,36 +90,39 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
     }
 
     response.send({message: "OK",
-                         usercreated: userCreated });
+                         usercreated: userCreated,
+                         password: NewUser.pwd});
 }
 
-async function createUser(Request : RequestData): Promise<number>{
+async function createUser(Request : RequestData): Promise<UserCreation>{
 
     type StaffId={
         staff_id: number
     }
 
-    const sql_insert_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated, passwd ) 
-                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW(),"$2a$08$OC5EGw.siFqLJjUCbtlJTeHX7gBEwHBa7zRQDSmedT7Y.5TcgkXNS")`;
+    const sql_insert_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated, passwd, change_passwd ) 
+                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW(),md5(?),"1")`;
 
 
     const sql_find_user: string = `SELECT staff_id FROM ost_staff WHERE username=?`;
 
+    let crypto = require("crypto");
+    let pwd = crypto.randomBytes(10).toString('hex');
 
     await sequelizeHost.query(sql_insert_user, {
         type: QueryTypes.INSERT,
-        replacements: [Config.DEFAULT_DEPT_ID, "v".concat(Request.user_id), Request.firstname, Request.lastname, Request.email]
+        replacements: [Config.DEFAULT_DEPT_ID, "v".concat(Request.user_id), Request.firstname, Request.lastname, Request.email, pwd]
     });
 
     const StaffId: StaffId[] = await sequelizeHost.query(sql_find_user, {
         type: QueryTypes.SELECT,
-        replacements: ["V".concat(Request.user_id)],
+        replacements: ["v".concat(Request.user_id)],
     });
 
     if (StaffId.length != 0) {
-        return StaffId[0].staff_id;
+        return {staff_id: StaffId[0].staff_id, pwd: pwd };
     }else{
-        return 0;
+        return {staff_id: 0, pwd: "" };
     }
 }
 export default {
