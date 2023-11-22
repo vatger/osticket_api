@@ -41,6 +41,7 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
         return;
     }
 
+
     const sql_find_user: string = `SELECT * FROM ost_staff WHERE username=?`;
     const sql_find_groups: string = `SELECT dept_id FROM ost_staff_dept_access WHERE staff_id=?`;
     const sql_delete_roles: string = `DELETE FROM ost_staff_dept_access WHERE staff_id=? and dept_id=?`;
@@ -55,13 +56,18 @@ async function syncUserGroups(request: Request, response: Response): Promise<voi
     if (data.length != 0) {
         StaffId = data[0].staff_id;
     } else {
-        NewUser = await createUser(requestData);
-        if (NewUser.staff_id == 0) {
-            response.status(500).send({error: "user could not be created"});
-            return;
-        } else {
-            userCreated = true;
-            StaffId = NewUser.staff_id
+        if (requestData.dept_ids.length != 0) {
+            NewUser = await createUser(requestData);
+            if (NewUser.staff_id == 0) {
+                response.status(500).send({error: "user could not be created"});
+                return;
+            } else {
+                userCreated = true;
+                StaffId = NewUser.staff_id
+            }
+        }else{
+            response.status(200).send({error: "Empty Groups - no user created"});
+            return ;
         }
     }
 
