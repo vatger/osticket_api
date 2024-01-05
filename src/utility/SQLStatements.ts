@@ -12,8 +12,8 @@ const sql_delete_roles: string = `DELETE
 const sql_insert_roles: string = `INSERT INTO ost_staff_dept_access (staff_id, dept_id, role_id, flags)
                                   VALUES (?, ?, ?, ?)`;
 
-const sql_create_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated, passwd, change_passwd ) 
-                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW(),md5(?),"1")`;
+const sql_create_user: string = `INSERT INTO ost_staff (dept_id, role_id, username, firstname, lastname,email, phone, mobile, signature, created, updated, passwd, change_passwd, permissions) 
+                                                    VALUES (?,"1",?,?,?,?,"","","",NOW(),NOW(),md5(?),"1",?)`;
 
 const sql_user_switch_active: string = `UPDATE ost_staff SET isactive = ? WHERE staff_id = ?`;
 

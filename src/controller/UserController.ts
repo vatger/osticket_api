@@ -144,11 +144,12 @@ async function createUser(Request : RequestData): Promise<User> {
     // gen init pwd
     let crypto = require("crypto");
     let pwd = crypto.randomBytes(10).toString('hex');
+    let permissions = "{\"user.create\":1,\"user.dir\":1,\"faq.manage\":1,\"visibility.departments\":1}";
 
     // insert user into osticket table
     await sequelizeHost.query(sql.create_user, {
         type: QueryTypes.INSERT,
-        replacements: [Config.DEFAULT_DEPT_ID, "v".concat(Request.user_id), Request.firstname, Request.lastname, Request.email, pwd]
+        replacements: [Config.DEFAULT_DEPT_ID, "v".concat(Request.user_id), Request.firstname, Request.lastname, Request.email, pwd, permissions]
     });
 
     // check if user creation successful and get additional fields
